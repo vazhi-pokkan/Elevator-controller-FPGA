@@ -1,0 +1,48 @@
+# VPTB-20 Spartan-6 Elevator Controller
+# Default board clock: 20 MHz
+
+NET "clk" LOC = "E10";
+NET "reset" LOC = "P175";
+
+# 4x4 matrix keypad
+# Rows: a0-a3 (outputs)
+NET "keypad_row<0>" LOC = "J1";
+NET "keypad_row<1>" LOC = "H1";
+NET "keypad_row<2>" LOC = "H2";
+NET "keypad_row<3>" LOC = "H3";
+
+# Columns: b0-b3 (inputs)
+NET "keypad_col<0>" LOC = "H4";
+NET "keypad_col<1>" LOC = "H5";
+NET "keypad_col<2>" LOC = "G1";
+NET "keypad_col<3>" LOC = "G3";
+
+# Display 1: a,b,c,d,e,f,g,dp
+NET "display1<0>" LOC = "T7";
+NET "display1<1>" LOC = "P7";
+NET "display1<2>" LOC = "N5";
+NET "display1<3>" LOC = "P1";
+NET "display1<4>" LOC = "P2";
+NET "display1<5>" LOC = "L8";
+NET "display1<6>" LOC = "N8";
+NET "display1<7>" LOC = "N4";
+
+# LEDs L40-L47
+NET "leds<0>" LOC = "A8";
+NET "leds<1>" LOC = "C8";
+NET "leds<2>" LOC = "E8";
+NET "leds<3>" LOC = "C7";
+NET "leds<4>" LOC = "A6";
+NET "leds<5>" LOC = "C6";
+NET "leds<6>" LOC = "E6";
+NET "leds<7>" LOC = "A5";
+
+# Optional pull-ups for keypad columns.
+NET "keypad_col<0>" PULLUP;
+NET "keypad_col<1>" PULLUP;
+NET "keypad_col<2>" PULLUP;
+NET "keypad_col<3>" PULLUP;
+
+# 20 MHz clock timing constraint
+NET "clk" TNM_NET = "clk_grp";
+TIMESPEC "TS_clk" = PERIOD "clk_grp" 50 ns HIGH 50%;
