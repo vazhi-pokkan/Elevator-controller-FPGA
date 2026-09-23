@@ -1,48 +1,170 @@
+# ============================================================
 # VPTB-20 Spartan-6 Elevator Controller
-# Default board clock: 20 MHz
+# Device: XC6SLX16-FTG256
+#
+# Clock: 20 MHz onboard oscillator
+# Reset: SW22
+# LCD: 16x2 LCD, 4-bit mode
+# Keypad: 4x4 Matrix Keypad
+# LEDs: 8 onboard LEDs
+# ============================================================
+
+
+# ============================================================
+# CLOCK
+# ============================================================
 
 NET "clk" LOC = "E10";
-NET "reset" LOC = "P175";
 
-# 4x4 matrix keypad
-# Rows: a0-a3 (outputs)
+NET "clk" TNM_NET = "clk_grp";
+
+TIMESPEC "TS_clk" = PERIOD "clk_grp" 50 ns HIGH 50%;
+
+
+# ============================================================
+# RESET
+#
+# SW22 -> B8
+#
+# Switch:
+#   OFF = 0 = normal operation
+#   ON  = 1 = reset
+# ============================================================
+
+NET "reset" LOC = "B8";
+
+
+# ============================================================
+# 4x4 MATRIX KEYPAD
+#
+# Rows = FPGA outputs
+# Columns = FPGA inputs
+#
+#        C0   C1   C2   C3
+#         |    |    |    |
+#      +--------------------+
+# R0   |  1 |  2 |  3 |  A |
+#      +--------------------+
+# R1   |  4 |  5 |  6 |  B |
+#      +--------------------+
+# R2   |  7 |  8 |  9 |  C |
+#      +--------------------+
+# R3   |  * |  0 |  # |  D |
+#      +--------------------+
+#
+# Board connections from manual
+# ============================================================
+
+# Keypad rows
+
 NET "keypad_row<0>" LOC = "J1";
 NET "keypad_row<1>" LOC = "H1";
 NET "keypad_row<2>" LOC = "H2";
 NET "keypad_row<3>" LOC = "H3";
 
-# Columns: b0-b3 (inputs)
+
+# Keypad columns
+
 NET "keypad_col<0>" LOC = "H4";
 NET "keypad_col<1>" LOC = "H5";
 NET "keypad_col<2>" LOC = "G1";
 NET "keypad_col<3>" LOC = "G3";
 
-# Display 1: a,b,c,d,e,f,g,dp
-NET "display1<0>" LOC = "T7";
-NET "display1<1>" LOC = "P7";
-NET "display1<2>" LOC = "N5";
-NET "display1<3>" LOC = "P1";
-NET "display1<4>" LOC = "P2";
-NET "display1<5>" LOC = "L8";
-NET "display1<6>" LOC = "N8";
-NET "display1<7>" LOC = "N4";
 
-# LEDs L40-L47
-NET "leds<0>" LOC = "A8";
-NET "leds<1>" LOC = "C8";
-NET "leds<2>" LOC = "E8";
-NET "leds<3>" LOC = "C7";
-NET "leds<4>" LOC = "A6";
-NET "leds<5>" LOC = "C6";
-NET "leds<6>" LOC = "E6";
-NET "leds<7>" LOC = "A5";
+# Enable pull-ups on keypad columns
 
-# Optional pull-ups for keypad columns.
 NET "keypad_col<0>" PULLUP;
 NET "keypad_col<1>" PULLUP;
 NET "keypad_col<2>" PULLUP;
 NET "keypad_col<3>" PULLUP;
 
-# 20 MHz clock timing constraint
-NET "clk" TNM_NET = "clk_grp";
-TIMESPEC "TS_clk" = PERIOD "clk_grp" 50 ns HIGH 50%;
+
+# ============================================================
+# 16x2 LCD
+#
+# Using 4-bit mode.
+#
+# LCD D0-D3 are NOT connected to FPGA.
+#
+# FPGA -> LCD
+#
+# lcd_data[4] -> LCD D4
+# lcd_data[5] -> LCD D5
+# lcd_data[6] -> LCD D6
+# lcd_data[7] -> LCD D7
+#
+# lcd_rs -> LCD RS
+# lcd_cs -> LCD CS / Enable
+# ============================================================
+
+NET "lcd_data<4>" LOC = "R9";
+NET "lcd_data<5>" LOC = "T9";
+NET "lcd_data<6>" LOC = "T8";
+NET "lcd_data<7>" LOC = "P8";
+
+NET "lcd_rs" LOC = "T10";
+NET "lcd_cs" LOC = "M10";
+
+
+# ============================================================
+# ONBOARD LEDs
+#
+# LED 0 -> L40
+# LED 1 -> L41
+# LED 2 -> L42
+# LED 3 -> L43
+# LED 4 -> L44
+# LED 5 -> L45
+# LED 6 -> L46
+# LED 7 -> L47
+# ============================================================
+
+NET "leds<0>" LOC = "A8";
+NET "leds<1>" LOC = "C8";
+NET "leds<2>" LOC = "E8";
+NET "leds<3>" LOC = "C7";
+
+NET "leds<4>" LOC = "A6";
+NET "leds<5>" LOC = "C6";
+NET "leds<6>" LOC = "E6";
+NET "leds<7>" LOC = "A5";
+
+
+# ============================================================
+# I/O STANDARD
+# ============================================================
+
+NET "clk" IOSTANDARD = LVCMOS33;
+NET "reset" IOSTANDARD = LVCMOS33;
+
+NET "keypad_row<0>" IOSTANDARD = LVCMOS33;
+NET "keypad_row<1>" IOSTANDARD = LVCMOS33;
+NET "keypad_row<2>" IOSTANDARD = LVCMOS33;
+NET "keypad_row<3>" IOSTANDARD = LVCMOS33;
+
+NET "keypad_col<0>" IOSTANDARD = LVCMOS33;
+NET "keypad_col<1>" IOSTANDARD = LVCMOS33;
+NET "keypad_col<2>" IOSTANDARD = LVCMOS33;
+NET "keypad_col<3>" IOSTANDARD = LVCMOS33;
+
+NET "lcd_data<4>" IOSTANDARD = LVCMOS33;
+NET "lcd_data<5>" IOSTANDARD = LVCMOS33;
+NET "lcd_data<6>" IOSTANDARD = LVCMOS33;
+NET "lcd_data<7>" IOSTANDARD = LVCMOS33;
+
+NET "lcd_rs" IOSTANDARD = LVCMOS33;
+NET "lcd_cs" IOSTANDARD = LVCMOS33;
+
+NET "leds<0>" IOSTANDARD = LVCMOS33;
+NET "leds<1>" IOSTANDARD = LVCMOS33;
+NET "leds<2>" IOSTANDARD = LVCMOS33;
+NET "leds<3>" IOSTANDARD = LVCMOS33;
+NET "leds<4>" IOSTANDARD = LVCMOS33;
+NET "leds<5>" IOSTANDARD = LVCMOS33;
+NET "leds<6>" IOSTANDARD = LVCMOS33;
+NET "leds<7>" IOSTANDARD = LVCMOS33;
+
+
+# ============================================================
+# END OF UCF
+# ============================================================
