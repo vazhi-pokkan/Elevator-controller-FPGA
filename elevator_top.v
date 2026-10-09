@@ -1,7 +1,11 @@
-
 module elevator_top(
     input        clk,
     input        reset,
+
+    // Special-mode switches (active HIGH; pin LOCs must match board manual)
+    input        sw_emergency,
+    input        sw_fire,
+    input        sw_maintenance,
 
     // Person counter switches
     input        enter_btn,
@@ -26,6 +30,10 @@ module elevator_top(
 
     wire floor_tick;
     wire door_tick;
+    wire sw_emergency_db, sw_fire_db, sw_maintenance_db;
+    wire emergency_active, fire_active, maintenance_active, sleep_active;
+    wire recall_request, clear_all_requests, inactivity_timeout;
+    wire system_idle;
 
     wire new_request;
     wire [1:0] request_floor;
@@ -97,6 +105,7 @@ module elevator_top(
         .request_floor(request_floor),
         .clear_request(clear_request),
         .clear_floor(clear_floor),
+        .clear_all_requests(clear_all_requests),
         .pending_requests(pending_requests)
     );
 
@@ -170,11 +179,62 @@ module elevator_top(
         .move_down(move_down),
         .destination_reached(destination_reached),
         .door_timer_done(door_timer_done),
+        .current_floor(current_floor),
+        .floor_tick(floor_tick),
+        .recall_request(recall_request),
+        .maintenance_active(maintenance_active),
+        .system_idle(system_idle),
         .moving_up(moving_up),
         .moving_down(moving_down),
         .door_open(door_open)
     );
 
+
+    // =========================================================
+    // Special-mode switch conditioning
+    // 2-flop synchronizer + 20 ms debounce at 1 kHz
+    // =========================================================
+
+    switch_conditioner #(.DEBOUNCE_TICKS(20)) u_emergency_conditioner (
+        .clk(clk), .reset(reset), .tick_1khz(door_tick),
+        .switch_in(sw_emergency), .switch_out(sw_emergency_db)
+    );
+
+    switch_conditioner #(.DEBOUNCE_TICKS(20)) u_fire_conditioner (
+        .clk(clk), .reset(reset), .tick_1khz(door_tick),
+        .switch_in(sw_fire), .switch_out(sw_fire_db)
+    );
+
+    switch_conditioner #(.DEBOUNCE_TICKS(20)) u_maintenance_conditioner (
+        .clk(clk), .reset(reset), .tick_1khz(door_tick),
+        .switch_in(sw_maintenance), .switch_out(sw_maintenance_db)
+    );
+
+    // =========================================================
+    // Inactivity timer: 30 seconds at 2 floor ticks/second
+    // =========================================================
+
+    inactivity_timer #(.TIMEOUT_TICKS(60)) u_inactivity_timer (
+        .clk(clk), .reset(reset), .floor_tick(floor_tick),
+        .system_idle(system_idle), .inactivity_timeout(inactivity_timeout)
+    );
+
+    // =========================================================
+    // Special modes controller
+    // Priority: emergency > fire > maintenance > sleep
+    // =========================================================
+
+    special_modes_fsm u_special_modes (
+        .clk(clk), .reset(reset),
+        .emergency_switch(sw_emergency_db),
+        .fire_switch(sw_fire_db),
+        .maintenance_switch(sw_maintenance_db),
+        .inactivity_timeout(inactivity_timeout),
+        .system_idle(system_idle), .wake_request(new_request),
+        .emergency_active(emergency_active), .fire_active(fire_active),
+        .maintenance_active(maintenance_active), .sleep_active(sleep_active),
+        .recall_request(recall_request), .clear_all_requests(clear_all_requests)
+    );
 
     // =========================================================
     // Person counter

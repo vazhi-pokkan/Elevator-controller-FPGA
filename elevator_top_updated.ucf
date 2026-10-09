@@ -1,0 +1,119 @@
+# ============================================================
+# VPTB-20 Spartan-6 Elevator Controller
+# Device: XC6SLX16-FTG256
+# Clock: 20 MHz onboard oscillator
+#
+# Existing project assignments preserved.
+# New switch assignments are based on the VPTB-20 manual:
+# SW22=B8, SW23=D8, SW24=A7, SW25=F7, SW26=B6, SW27=D6
+# ============================================================
+
+# ============================================================
+# CLOCK
+# ============================================================
+NET "clk" LOC = "E10";
+NET "clk" TNM_NET = "clk_grp";
+TIMESPEC "TS_clk" = PERIOD "clk_grp" 50 ns HIGH 50%;
+NET "clk" IOSTANDARD = LVCMOS33;
+
+# ============================================================
+# RESET
+# Preserved from the existing UCF: SW22, active HIGH per project comment
+# Note: board manual separately identifies the dedicated RESET pushbutton
+# at P175; this constraint intentionally preserves the existing SW22 mapping.
+# ============================================================
+NET "reset" LOC = "B8";
+NET "reset" IOSTANDARD = LVCMOS33;
+
+# ============================================================
+# SPECIAL-MODE SWITCHES
+# Manual page 7: SW23=D8, SW24=A7, SW25=F7
+# Board slide switches are HIGH when ON/UP and LOW when OFF/DOWN.
+# ============================================================
+NET "sw_emergency" LOC = "D8";
+NET "sw_fire" LOC = "A7";
+NET "sw_maintenance" LOC = "F7";
+NET "sw_emergency" IOSTANDARD = LVCMOS33;
+NET "sw_fire" IOSTANDARD = LVCMOS33;
+NET "sw_maintenance" IOSTANDARD = LVCMOS33;
+
+# ============================================================
+# PERSON COUNTER SWITCHES
+# Manual page 7: SW26=B6, SW27=D6
+# ============================================================
+NET "enter_btn" LOC = "B6";
+NET "exit_btn" LOC = "D6";
+NET "enter_btn" IOSTANDARD = LVCMOS33;
+NET "exit_btn" IOSTANDARD = LVCMOS33;
+
+# ============================================================
+# 4x4 MATRIX KEYPAD
+# Rows = FPGA outputs; columns = FPGA inputs
+# ============================================================
+NET "keypad_row<0>" LOC = "J1";
+NET "keypad_row<1>" LOC = "H1";
+NET "keypad_row<2>" LOC = "H2";
+NET "keypad_row<3>" LOC = "H3";
+
+NET "keypad_col<0>" LOC = "H4";
+NET "keypad_col<1>" LOC = "H5";
+NET "keypad_col<2>" LOC = "G1";
+NET "keypad_col<3>" LOC = "G3";
+
+NET "keypad_col<0>" PULLUP;
+NET "keypad_col<1>" PULLUP;
+NET "keypad_col<2>" PULLUP;
+NET "keypad_col<3>" PULLUP;
+
+NET "keypad_row<0>" IOSTANDARD = LVCMOS33;
+NET "keypad_row<1>" IOSTANDARD = LVCMOS33;
+NET "keypad_row<2>" IOSTANDARD = LVCMOS33;
+NET "keypad_row<3>" IOSTANDARD = LVCMOS33;
+NET "keypad_col<0>" IOSTANDARD = LVCMOS33;
+NET "keypad_col<1>" IOSTANDARD = LVCMOS33;
+NET "keypad_col<2>" IOSTANDARD = LVCMOS33;
+NET "keypad_col<3>" IOSTANDARD = LVCMOS33;
+
+# ============================================================
+# 16x2 LCD, 4-bit data mode
+# lcd_data[4:7] -> LCD D4:D7
+# lcd_cs is connected to LCD Enable/CS as in existing UCF
+# ============================================================
+NET "lcd_data<4>" LOC = "R9";
+NET "lcd_data<5>" LOC = "T9";
+NET "lcd_data<6>" LOC = "T8";
+NET "lcd_data<7>" LOC = "P8";
+NET "lcd_rs" LOC = "T10";
+NET "lcd_cs" LOC = "M10";
+
+NET "lcd_data<4>" IOSTANDARD = LVCMOS33;
+NET "lcd_data<5>" IOSTANDARD = LVCMOS33;
+NET "lcd_data<6>" IOSTANDARD = LVCMOS33;
+NET "lcd_data<7>" IOSTANDARD = LVCMOS33;
+NET "lcd_rs" IOSTANDARD = LVCMOS33;
+NET "lcd_cs" IOSTANDARD = LVCMOS33;
+
+# ============================================================
+# ONBOARD LEDs L40-L47
+# ============================================================
+NET "leds<0>" LOC = "A8";
+NET "leds<1>" LOC = "C8";
+NET "leds<2>" LOC = "E8";
+NET "leds<3>" LOC = "C7";
+NET "leds<4>" LOC = "A6";
+NET "leds<5>" LOC = "C6";
+NET "leds<6>" LOC = "E6";
+NET "leds<7>" LOC = "A5";
+
+NET "leds<0>" IOSTANDARD = LVCMOS33;
+NET "leds<1>" IOSTANDARD = LVCMOS33;
+NET "leds<2>" IOSTANDARD = LVCMOS33;
+NET "leds<3>" IOSTANDARD = LVCMOS33;
+NET "leds<4>" IOSTANDARD = LVCMOS33;
+NET "leds<5>" IOSTANDARD = LVCMOS33;
+NET "leds<6>" IOSTANDARD = LVCMOS33;
+NET "leds<7>" IOSTANDARD = LVCMOS33;
+
+# ============================================================
+# END OF UCF
+# ============================================================
