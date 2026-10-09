@@ -1,6 +1,11 @@
+
 module elevator_top(
     input        clk,
     input        reset,
+
+    // Person counter switches
+    input        enter_btn,
+    input        exit_btn,
 
     // 4x4 matrix keypad
     input  [3:0] keypad_col,
@@ -44,13 +49,15 @@ module elevator_top(
     wire clear_request;
     wire [1:0] clear_floor;
 
+    // Person counter signals
+    wire [3:0] person_count;
+    wire person_empty;
+    wire person_full;
+
 
     // =========================================================
     // Clock divider
     // 20 MHz clock
-    //
-    // floor_tick = 2 Hz
-    // door_tick  = 1 kHz
     // =========================================================
 
     clock_divider #(
@@ -86,13 +93,10 @@ module elevator_top(
     request_register u_req (
         .clk(clk),
         .reset(reset),
-
         .new_request(new_request),
         .request_floor(request_floor),
-
         .clear_request(clear_request),
         .clear_floor(clear_floor),
-
         .pending_requests(pending_requests)
     );
 
@@ -104,10 +108,8 @@ module elevator_top(
     elevator_scheduler u_sched (
         .current_floor(current_floor),
         .pending_requests(pending_requests),
-
         .moving_up(moving_up),
         .moving_down(moving_down),
-
         .request_valid(request_valid),
         .target_floor(target_floor)
     );
@@ -121,7 +123,6 @@ module elevator_top(
         .current_floor(current_floor),
         .target_floor(target_floor),
         .request_valid(request_valid),
-
         .move_up(move_up),
         .move_down(move_down),
         .destination_reached(destination_reached)
@@ -136,10 +137,8 @@ module elevator_top(
         .clk(clk),
         .reset(reset),
         .floor_tick(floor_tick),
-
         .moving_up(moving_up),
         .moving_down(moving_down),
-
         .current_floor(current_floor)
     );
 
@@ -153,10 +152,8 @@ module elevator_top(
     ) u_door_timer (
         .clk(clk),
         .reset(reset),
-
         .door_open(door_open),
         .door_tick(door_tick),
-
         .door_timer_done(door_timer_done)
     );
 
@@ -168,18 +165,32 @@ module elevator_top(
     elevator_fsm u_fsm (
         .clk(clk),
         .reset(reset),
-
         .request_valid(request_valid),
-
         .move_up(move_up),
         .move_down(move_down),
-
         .destination_reached(destination_reached),
         .door_timer_done(door_timer_done),
-
         .moving_up(moving_up),
         .moving_down(moving_down),
         .door_open(door_open)
+    );
+
+
+    // =========================================================
+    // Person counter
+    // Maximum capacity = 8 people
+    // =========================================================
+
+    person_counter #(
+        .MAX_CAPACITY(8)
+    ) u_person_counter (
+        .clk(clk),
+        .reset(reset),
+        .enter_btn(enter_btn),
+        .exit_btn(exit_btn),
+        .count(person_count),
+        .is_empty(person_empty),
+        .is_full(person_full)
     );
 
 
@@ -193,18 +204,16 @@ module elevator_top(
 
     // =========================================================
     // LCD DISPLAY
+    // Existing interface preserved
     // =========================================================
 
     lcd_display u_display (
         .clk(clk),
         .reset(reset),
-
         .current_floor(current_floor),
-
         .moving_up(moving_up),
         .moving_down(moving_down),
         .door_open(door_open),
-
         .lcd_data(lcd_data),
         .lcd_rs(lcd_rs),
         .lcd_cs(lcd_cs)
@@ -214,10 +223,10 @@ module elevator_top(
     // =========================================================
     // ON-BOARD LEDs
     //
-    // LED 0 = Moving UP
-    // LED 1 = Moving DOWN
-    // LED 2 = Door OPEN
-    // LED 3 = Request active
+    // LED 0   = Moving UP
+    // LED 1   = Moving DOWN
+    // LED 2   = Door OPEN
+    // LED 3   = Request active
     // LED 4-5 = Current floor (binary)
     // LED 6-7 = Pending requests 1-2
     // =========================================================
@@ -228,7 +237,6 @@ module elevator_top(
     assign leds[3] = request_valid;
 
     assign leds[5:4] = current_floor;
-
     assign leds[7:6] = pending_requests[1:0];
 
 endmodule
