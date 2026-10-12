@@ -14,7 +14,7 @@ module special_modes_fsm (
     output wire recall_request,
     output wire clear_all_requests
 );
-assign recall_request = emergency_active | fire_active;
+assign recall_request = emergency_active;
 assign clear_all_requests = recall_request | maintenance_active;
 
 always @(*) begin
