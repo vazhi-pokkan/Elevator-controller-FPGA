@@ -1,0 +1,162 @@
+# VPTB-20 Spartan-6 Elevator Controller
+# Default board clock: 20 MHz
+# Updated seven-segment mapping based on the actual board:
+#   seg1 -> physical Display 1 (current floor)
+#   seg3 -> physical Display 4 (door status)
+#   seg4 -> physical Display 3 (person counter)
+# Display 2 is unused.
+#
+# Segment bus order in Verilog: {a,b,c,d,e,f,g,dp}
+# NOTE: Reset remains on B8 as in the user's existing UCF.
+# The manual reportedly labels B8 as SW22, so verify this board mapping.
+
+NET "clk" LOC = "E10";
+NET "clk" PERIOD = 50 ns HIGH 50%;
+
+NET "reset" LOC = "R7";
+
+# Buzzer: activates when emergency mode is active (controlled in Verilog)
+NET "buzzer" LOC = "K2";
+
+#Relay
+NET "relay" LOC = "L1";
+
+# Special mode switches and buttons
+NET "sw_emergency" LOC = "B8";
+NET "sw_fire" LOC = "D8";
+NET "sw_maintenance" LOC = "A7";
+
+# 4x4 matrix keypad
+# Rows: outputs
+NET "keypad_row<0>" LOC = "J1";
+NET "keypad_row<1>" LOC = "H1";
+NET "keypad_row<2>" LOC = "H2";
+NET "keypad_row<3>" LOC = "H3";
+
+# Columns: inputs
+NET "keypad_col<0>" LOC = "H4" | PULLUP;
+NET "keypad_col<1>" LOC = "H5" | PULLUP;
+NET "keypad_col<2>" LOC = "G1" | PULLUP;
+NET "keypad_col<3>" LOC = "G3" | PULLUP;
+
+# On-board LEDs
+NET "leds<0>" LOC = "A8";
+NET "leds<1>" LOC = "C8";
+NET "leds<2>" LOC = "D1";
+NET "leds<3>" LOC = "C7";
+#NET "leds<4>" LOC = "A6";
+#NET "leds<5>" LOC = "C6";
+#NET "leds<6>" LOC = "A5";
+NET "leds<7>" LOC = "C1";
+
+# Seven-segment Display 1: current floor
+
+# Physical Display 4: door status
+# Corrected: use the pin group previously listed for Display 4 in the manual.
+
+# Physical Display 3: person counter
+# Corrected: use the pin group previously listed for Display 3 in the manual.
+
+# Display 1: current floor (seg1)
+NET "seg1<7>" LOC = "T7";
+NET "seg1<6>" LOC = "P7";
+NET "seg1<5>" LOC = "N5";
+NET "seg1<4>" LOC = "P1";
+NET "seg1<3>" LOC = "P2";
+NET "seg1<2>" LOC = "L8";
+NET "seg1<1>" LOC = "N8";
+NET "seg1<0>" LOC = "N4";
+
+# Physical Display 2: door status, driven by existing Verilog output seg3
+NET "seg3<7>" LOC = "T4";
+NET "seg3<6>" LOC = "T3";
+NET "seg3<5>" LOC = "M2";
+NET "seg3<4>" LOC = "M3";
+NET "seg3<3>" LOC = "M4";
+NET "seg3<2>" LOC = "T5";
+NET "seg3<1>" LOC = "R5";
+NET "seg3<0>" LOC = "M1";
+
+# Physical Display 3: person counter, driven by existing Verilog output seg4
+NET "seg4<7>" LOC = "P5";
+NET "seg4<6>" LOC = "P4";
+NET "seg4<5>" LOC = "L4";
+NET "seg4<4>" LOC = "L5";
+NET "seg4<3>" LOC = "L7";
+NET "seg4<2>" LOC = "R1";
+NET "seg4<1>" LOC = "R2";
+NET "seg4<0>" LOC = "L3";
+
+#Display 2 reset
+NET "seg2<7>" LOC = "P6";
+NET "seg2<6>" LOC = "N6";
+NET "seg2<5>" LOC = "M6";
+NET "seg2<4>" LOC = "N1";
+NET "seg2<3>" LOC = "N3";
+NET "seg2<2>" LOC = "T6";
+NET "seg2<1>" LOC = "M7";
+NET "seg2<0>" LOC = "M5";
+
+# All I/O uses 3.3 V logic
+NET "clk" IOSTANDARD = LVCMOS33;
+NET "reset" IOSTANDARD = LVCMOS33;
+NET "sw_emergency" IOSTANDARD = LVCMOS33;
+NET "sw_fire" IOSTANDARD = LVCMOS33;
+NET "sw_maintenance" IOSTANDARD = LVCMOS33;
+NET "buzzer" IOSTANDARD = LVCMOS33;
+NET "relay" IOSTANDARD = LVCMOS33;
+
+NET "keypad_row<0>" IOSTANDARD = LVCMOS33;
+NET "keypad_row<1>" IOSTANDARD = LVCMOS33;
+NET "keypad_row<2>" IOSTANDARD = LVCMOS33;
+NET "keypad_row<3>" IOSTANDARD = LVCMOS33;
+NET "keypad_col<0>" IOSTANDARD = LVCMOS33;
+NET "keypad_col<1>" IOSTANDARD = LVCMOS33;
+NET "keypad_col<2>" IOSTANDARD = LVCMOS33;
+NET "keypad_col<3>" IOSTANDARD = LVCMOS33;
+
+NET "leds<0>" IOSTANDARD = LVCMOS33;
+NET "leds<1>" IOSTANDARD = LVCMOS33;
+NET "leds<2>" IOSTANDARD = LVCMOS33;
+NET "leds<3>" IOSTANDARD = LVCMOS33;
+NET "leds<4>" IOSTANDARD = LVCMOS33;
+NET "leds<5>" IOSTANDARD = LVCMOS33;
+NET "leds<6>" IOSTANDARD = LVCMOS33;
+NET "leds<7>" IOSTANDARD = LVCMOS33;
+
+# Seven-segment I/O standards
+NET "seg1<7>" IOSTANDARD = LVCMOS33;
+NET "seg1<6>" IOSTANDARD = LVCMOS33;
+NET "seg1<5>" IOSTANDARD = LVCMOS33;
+NET "seg1<4>" IOSTANDARD = LVCMOS33;
+NET "seg1<3>" IOSTANDARD = LVCMOS33;
+NET "seg1<2>" IOSTANDARD = LVCMOS33;
+NET "seg1<1>" IOSTANDARD = LVCMOS33;
+NET "seg1<0>" IOSTANDARD = LVCMOS33;
+
+NET "seg3<7>" IOSTANDARD = LVCMOS33;
+NET "seg3<6>" IOSTANDARD = LVCMOS33;
+NET "seg3<5>" IOSTANDARD = LVCMOS33;
+NET "seg3<4>" IOSTANDARD = LVCMOS33;
+NET "seg3<3>" IOSTANDARD = LVCMOS33;
+NET "seg3<2>" IOSTANDARD = LVCMOS33;
+NET "seg3<1>" IOSTANDARD = LVCMOS33;
+NET "seg3<0>" IOSTANDARD = LVCMOS33;
+
+NET "seg4<7>" IOSTANDARD = LVCMOS33;
+NET "seg4<6>" IOSTANDARD = LVCMOS33;
+NET "seg4<5>" IOSTANDARD = LVCMOS33;
+NET "seg4<4>" IOSTANDARD = LVCMOS33;
+NET "seg4<3>" IOSTANDARD = LVCMOS33;
+NET "seg4<2>" IOSTANDARD = LVCMOS33;
+NET "seg4<1>" IOSTANDARD = LVCMOS33;
+NET "seg4<0>" IOSTANDARD = LVCMOS33;
+
+NET "seg2<7>" IOSTANDARD = LVCMOS33;
+NET "seg2<6>" IOSTANDARD = LVCMOS33;
+NET "seg2<5>" IOSTANDARD = LVCMOS33;
+NET "seg2<4>" IOSTANDARD = LVCMOS33;
+NET "seg2<3>" IOSTANDARD = LVCMOS33;
+NET "seg2<2>" IOSTANDARD = LVCMOS33;
+NET "seg2<1>" IOSTANDARD = LVCMOS33;
+NET "seg2<0>" IOSTANDARD = LVCMOS33;
